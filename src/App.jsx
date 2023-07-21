@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import platform from './img/platform.png'
 import hills from './img/hills.png'
 import background from './img/background.png'
