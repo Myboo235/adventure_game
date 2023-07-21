@@ -2,7 +2,7 @@
   "name": "adventure_game",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://Myboo235.github.io/react-gh-pages",
+  "homepage": "https://Myboo235.github.io/adventure_game",
   "type": "module",
   "scripts": {
     "dev": "vite",
