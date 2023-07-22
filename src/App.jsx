@@ -38,7 +38,7 @@ function App() {
         }
         this.height = 150
         this.width = 66
-        this.speed = 20
+        this.speed = 10
         this.image = createImg(spriteStandRight)
         this.frame = 0  
         this.sprite = {
