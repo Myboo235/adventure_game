@@ -9,6 +9,8 @@ import spriteRunRight from './img/spriteRunRight.png'
 import spriteStandLeft from './img/spriteStandLeft.png'
 import spriteStandRight from './img/spriteStandRight.png'
 
+import winScreen from './img/winScreen.png'
+
 
 function App() {
 
@@ -36,7 +38,7 @@ function App() {
         }
         this.height = 150
         this.width = 66
-        this.speed = 10
+        this.speed = 20
         this.image = createImg(spriteStandRight)
         this.frame = 0  
         this.sprite = {
@@ -131,6 +133,25 @@ function App() {
         }
     }
 
+    class WinObject {
+        constructor({x ,y }){
+            this.position = {
+                x,
+                y
+            }
+
+            this.width = 300
+            this.height = 200
+            // this.image = image
+        }
+
+        draw(){
+            //c.drawImage(this.image,this.position.x,this.position.y)
+            c.fillStyle = 'blue'
+            c.fillRect(this.position.x , this.position.y , this.width , this.height)
+        }
+    }
+
     function createImg(imgSrc){
         const img = new Image()
         img.src = imgSrc;
@@ -146,7 +167,7 @@ function App() {
 
     function init(){
         player = new Player();
-        platforms = [
+        // platforms = [
         // new Platform({x : createImg(platform).width*4 + createImg(platformSmallTall).width +300-2, y : 250 , image : createImg(platformSmallTall)}),
         // new Platform({x : -1, y : 450 , image : createImg(platform)}),
         // new Platform({x : createImg(platform).width -2 , y : 450 , image : createImg(platform)}),
@@ -154,39 +175,38 @@ function App() {
         // new Platform({x : createImg(platform).width*3 +300, y : 450 , image : createImg(platform)}),
         // new Platform({x : createImg(platform).width*4 +300-2, y : 450 , image : createImg(platform)}),
         // new Platform({x : createImg(platform).width*5 +1000-2, y : 450 , image : createImg(platform)}),
-        ];
+        // ];
         genericObjets = [
         new GenericObject({x : -1 , y : -1 , image : createImg(background)}),
         new GenericObject({x : -1 , y : -1 , image : createImg(hills)})
         ]
 
-       const numberOfPlatforms = 50;
+        const platformWidth = createImg(platform).width;
+        const platformSmallWidth = createImg(platformSmallTall).width;
 
-    // Define the minimum and maximum y values for the platforms
-    const maxY = 550;
-    const minY = 0;
+        platforms = [
+        // First type of platform (platformSmall)
+        new Platform({ x: platformWidth * 4 + platformSmallWidth + 300 - 4, y: 250, image: createImg(platformSmallTall), width: platformSmallWidth }),
+        new Platform({ x: -1, y: 450, image: createImg(platform), width: platformWidth }),
+        new Platform({ x: platformWidth - 2, y: 450, image: createImg(platform), width: platformWidth }),
+        new Platform({ x: platformWidth * 2 + 100, y: 450, image: createImg(platform), width: platformWidth }),
+        new Platform({ x: platformWidth * 3 + 300, y: 450, image: createImg(platform), width: platformWidth }),
+        new Platform({ x: platformWidth * 4 + 300 - 2, y: 450, image: createImg(platform), width: platformWidth }),
+        new Platform({ x: platformWidth * 5 + 1000 - 2, y: 450, image: createImg(platform), width: platformWidth }),
 
-    // Calculate the minimum x distance between platforms
-    const minPlatformDistance = createImg(platform).width - 2;
+        // Second type of platform (platform)
+        new Platform({ x: platformWidth * 6 + platformSmallWidth + 1000 - 2, y: 450, image: createImg(platformSmallTall), width: platformWidth }),
+        new Platform({ x: platformWidth * 7 + platformSmallWidth + 1000 - 2, y: 350, image: createImg(platformSmallTall), width: platformWidth }),
+        new Platform({ x: platformWidth * 8 + platformSmallWidth + 1000 - 2, y: 250, image: createImg(platformSmallTall), width: platformWidth }),
+        new Platform({ x: platformWidth * 9 + platformSmallWidth + 1000 - 2, y: 350, image: createImg(platformSmallTall), width: platformWidth }),
+        new Platform({ x: platformWidth * 27 + platformSmallWidth + 1000 - 2, y: 250, image: createImg(platformSmallTall), width: platformWidth }),
 
-    let prevPlatformX = 0;
+        new Platform({ x: platformWidth * 27 + platformSmallWidth + 1000 - 2, y: 100, image: createImg(winScreen), width: platformWidth })
 
-    for (let i = 0; i < numberOfPlatforms; i++) {
-        // Generate a random y value within the range of minY and maxY
-        const randomY = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
-
-        // Generate a random x distance between platforms, but at least minPlatformDistance
-        const randomXDistance = Math.max(minPlatformDistance, Math.random() * minPlatformDistance);
-
-        // Calculate the x position for the platform based on the previous platform's x position and the random x distance
-        const platformX = prevPlatformX + randomXDistance;
-
-        // Update the previous platform's x position
-        prevPlatformX = platformX;
-
-        // Create a new platform object and add it to the platforms array
-        platforms.push(new Platform({x: platformX, y: randomY, image: createImg(platform)}));
-    }
+        ];
+        for (let i = 10; i <= 26; i++) {
+            platforms.push(new Platform({ x: platformWidth * i + platformSmallWidth + 1000 - 2, y: 450, image: createImg(platform), width: platformWidth }));
+        }
 
         scrollOffset = 0 ;
     }
@@ -211,7 +231,7 @@ player.draw();
 player.update();
 
 let scrollOffset = 0 ;
-
+const maxOffset = createImg(platform).width * 27 + createImg(platformSmallTall).width*0 + 1000 - 2;
 function animate(){
     requestAnimationFrame(animate);
     c.fillStyle = 'white'
@@ -226,7 +246,9 @@ function animate(){
     })
     
     player.update();
-    if(keys.right.pressed && player.position.x < 400){
+    if(
+        (keys.right.pressed && player.position.x < 400)
+    || (keys.right.pressed && scrollOffset === maxOffset-200 && player.position.x <= maxOffset-200)){
         player.velocity.x = player.speed;
     }else if(
         (keys.left.pressed && player.position.x > 100)
@@ -235,10 +257,13 @@ function animate(){
     }else{
         player.velocity.x = 0;
 
-        if(keys.right.pressed){
-            genericObjets.forEach(go => {
+        if(keys.right.pressed && scrollOffset <= maxOffset-200){
+            if(scrollOffset <= maxOffset-700){
+                genericObjets.forEach(go => {
                 go.position.x -=player.speed*0.66
             })
+            }
+            
             scrollOffset +=player.speed;
             platforms.forEach(platform => {
                 platform.position.x -=player.speed
@@ -304,7 +329,7 @@ function animate(){
         player.currentWidth = player.sprite.stand.width
     }
     //win
-    if(scrollOffset > 5000){
+    if(scrollOffset > maxOffset){
         console.log('You win')
     }
 
@@ -317,6 +342,8 @@ function animate(){
 
 init()
 animate()
+const win = new WinObject({x : createImg(platform).width * 27 + createImg(platformSmallTall) + 1000 - 2 , y : 200})
+win.draw()
 
 window.addEventListener('keydown' , ({ keyCode }) =>{
     console.log(keyCode);
@@ -340,7 +367,7 @@ window.addEventListener('keydown' , ({ keyCode }) =>{
         }
         case 87:{
             console.log("up")
-            player.velocity.y -= (player.speed + 5); 
+            player.velocity.y -= 15; 
             break
         }
     }
